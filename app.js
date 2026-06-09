@@ -407,13 +407,83 @@ function drawParticleShadow(ctx,x,y,r){
   ctx.restore();
 }
 
+function drawSpeaker(ctx, x, y, scale){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.scale(scale,scale);
+
+  // blue sound waves
+  for(let i=0;i<4;i++){
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(34,150,255,${0.34 - i*0.06})`;
+    ctx.lineWidth = 3 - i*0.35;
+    ctx.arc(18,0,34+i*19,-0.82,0.82);
+    ctx.stroke();
+  }
+
+  // speaker body
+  const body = ctx.createLinearGradient(-32,-58,18,58);
+  body.addColorStop(0,"#48566b");
+  body.addColorStop(.38,"#1b2433");
+  body.addColorStop(1,"#050914");
+  ctx.fillStyle=body;
+  ctx.strokeStyle="rgba(34,211,238,.42)";
+  ctx.lineWidth=1.4;
+  roundRect(ctx,-58,-60,38,120,12);
+  ctx.fill();
+  ctx.stroke();
+
+  // cone ring
+  const ring = ctx.createRadialGradient(-8,-8,6,0,0,54);
+  ring.addColorStop(0,"#162033");
+  ring.addColorStop(.45,"#0b1222");
+  ring.addColorStop(.68,"#1b7cff");
+  ring.addColorStop(1,"#00e5ff");
+  ctx.fillStyle=ring;
+  ctx.beginPath();
+  ctx.ellipse(-6,0,36,48,0,0,Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle="rgba(185,240,255,.55)";
+  ctx.lineWidth=1.4;
+  ctx.stroke();
+
+  const cone = ctx.createRadialGradient(-10,-8,4,-4,0,34);
+  cone.addColorStop(0,"#9feaff");
+  cone.addColorStop(.35,"#267dff");
+  cone.addColorStop(.75,"#07162c");
+  cone.addColorStop(1,"#020617");
+  ctx.fillStyle=cone;
+  ctx.beginPath();
+  ctx.ellipse(-5,0,23,33,0,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle="#010813";
+  ctx.beginPath();
+  ctx.ellipse(-4,0,11,16,0,0,Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);
+}
+
 function drawLongitudinalFinal(ctx, c, p, w, h){
   ctx.clearRect(0,0,w,h);
 
   // Background
   const bg=ctx.createLinearGradient(0,0,w,h);
   bg.addColorStop(0,"#020817");
-  bg.addColorStop(1,"#08152b");
+  bg.addColorStop(1,"#07152c");
   ctx.fillStyle=bg;
   ctx.fillRect(0,0,w,h);
 
@@ -423,121 +493,123 @@ function drawLongitudinalFinal(ctx, c, p, w, h){
   for(let x=0;x<w;x+=80){
     ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
   }
-  for(let y=0;y<h;y+=60){
+  for(let y=0;y<h;y+=52){
     ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
   }
 
-  const pad = 46;
-  const eqX = w * 0.50;
+  const eqX = w * 0.52;
+  const speakerX = 74;
+  const speakerY = h * 0.52;
+  const xMin = 142;
+  const xMax = w - 70;
 
-  // Particle band is above x-axis, compact and now placed lower so the graph
-  // fills the stage better on mobile and reduces unused space under the x-axis.
-  const rows = 4;
-  const rowGap = 15;
-  const particleRadius = 7.0;
-  const y0 = Math.max(96, h - 88);
-  const axisY = y0 + rowGap * 3 + 4;
-  const xMin = pad + 32;
-  const xMax = w - pad - 54;
+  // Dense particle medium: many rows to make the graph visually full.
+  const rows = 12;
+  const rowGap = 17;
+  const particleRadius = 6.4;
+  const bandHeight = (rows - 1) * rowGap;
+  const y0 = Math.max(118, Math.min(h - bandHeight - 46, h * 0.35));
+  const yCenter = y0 + bandHeight * 0.5;
+  const axisY = y0 + bandHeight + 28;
 
-  const ampPx = 18 + (18 * p.A);      // visual max displacement, fixed A marker uses this
-  const currentAmpPx = 18 * p.A;      // moving particle field
-  const baseGap = 28;
-  const k = 2 * Math.PI / 280;
+  const currentAmpPx = 15.5 * p.A;
+  const baseGap = 31;
+  const k = 2 * Math.PI / 255;
   const phase = vizState.t * 0.105 * p.speed;
-
-  const obsRow = 1;
-  const obsBaseX = eqX; // reference particle starts at the equilibrium position
+  const obsRow = Math.floor(rows/2);
+  const obsBaseX = eqX;
   let obsX = obsBaseX;
   let obsY = y0 + obsRow * rowGap;
 
-  // Decorative compression/rarefaction bands: subtle, not a legend.
-  const bandCenters=[xMin+70,xMin+245,xMin+420,xMin+600,xMin+780];
+  // Speaker source on the left
+  drawSpeaker(ctx, speakerX, yCenter, 1.05);
+
+  // Compression/rarefaction glow bands
+  const bandCenters=[xMin+55,xMin+235,xMin+430,xMin+620,xMin+805];
   bandCenters.forEach((bx,i)=>{
-    const g=ctx.createLinearGradient(bx-52,0,bx+52,0);
-    const col=i%2===0?"rgba(34,211,238,.12)":"rgba(168,85,247,.12)";
+    const g=ctx.createLinearGradient(bx-48,0,bx+48,0);
+    const col=i%2===0?"rgba(34,211,238,.15)":"rgba(168,85,247,.14)";
     g.addColorStop(0,"rgba(0,0,0,0)");
     g.addColorStop(.5,col);
     g.addColorStop(1,"rgba(0,0,0,0)");
     ctx.fillStyle=g;
-    ctx.fillRect(bx-58,94,116,Math.max(72, axisY - 90));
+    ctx.fillRect(bx-56,Math.max(58,y0-18),112,bandHeight+50);
   });
 
   // Title label on canvas
   ctx.fillStyle="#cfe9ff";
   ctx.font="20px Sarabun, system-ui, sans-serif";
   ctx.textAlign="left";
-  ctx.fillText("Longitudinal Wave (คลื่นตามยาว)", 24, 36);
+  ctx.fillText("Longitudinal Wave (คลื่นตามยาว)", 24, 34);
 
-  // Wave propagation arrow
+  // Wave propagation arrow: moved closer to equilibrium/particle field
+  const arrowY = Math.max(70, y0 - 48);
   ctx.save();
-  ctx.strokeStyle="rgba(34,211,238,.95)";
-  ctx.fillStyle="rgba(34,211,238,.95)";
+  ctx.strokeStyle="rgba(34,211,238,.96)";
+  ctx.fillStyle="rgba(34,211,238,.96)";
   ctx.lineWidth=4;
   ctx.beginPath();
-  ctx.moveTo(w*0.34,Math.max(54, y0 - 48));
-  ctx.lineTo(w*0.66,Math.max(54, y0 - 48));
+  ctx.moveTo(w*0.36,arrowY);
+  ctx.lineTo(w*0.78,arrowY);
   ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(w*0.66,Math.max(54, y0 - 48));
-  ctx.lineTo(w*0.64,Math.max(42, y0 - 60));
-  ctx.lineTo(w*0.64,Math.max(66, y0 - 36));
+  ctx.moveTo(w*0.78,arrowY);
+  ctx.lineTo(w*0.755,arrowY-13);
+  ctx.lineTo(w*0.755,arrowY+13);
   ctx.closePath();
   ctx.fill();
-  ctx.font="bold 17px Sarabun, system-ui, sans-serif";
+  ctx.font="bold 18px Sarabun, system-ui, sans-serif";
   ctx.textAlign="center";
-  ctx.fillText("ทิศทางการเคลื่อนที่ของคลื่น", w*0.50, Math.max(38, y0 - 62));
+  ctx.fillText("ทิศทางการเคลื่อนที่ของคลื่น", w*0.56, arrowY-18);
   ctx.restore();
 
   // Equilibrium line and label
+  const eqLabelY = y0 - 17;
   ctx.save();
-  ctx.strokeStyle="rgba(255,255,255,.72)";
+  ctx.strokeStyle="rgba(255,255,255,.78)";
   ctx.setLineDash([8,8]);
   ctx.lineWidth=2;
   ctx.beginPath();
-  ctx.moveTo(eqX, Math.max(60, y0 - 18));
-  ctx.lineTo(eqX, y0 + rowGap*3 + 16);
+  ctx.moveTo(eqX, eqLabelY + 8);
+  ctx.lineTo(eqX, axisY + 2);
   ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle="rgba(255,255,255,.95)";
+  ctx.fillStyle="rgba(255,255,255,.96)";
   ctx.textAlign="center";
   ctx.font="16px Sarabun, system-ui, sans-serif";
-  ctx.fillText("ตำแหน่งสมดุล", eqX, Math.max(54, y0 - 20));
+  ctx.fillText("ตำแหน่งสมดุล", eqX, eqLabelY);
   ctx.restore();
 
-
-  // x-axis: no numbers, no lambda
+  // x-axis: close to the medium, no numbers
   ctx.save();
-  ctx.strokeStyle="rgba(255,245,220,.92)";
-  ctx.fillStyle="rgba(255,255,255,.92)";
+  ctx.strokeStyle="rgba(255,245,220,.94)";
+  ctx.fillStyle="rgba(255,255,255,.94)";
   ctx.lineWidth=2;
   ctx.beginPath();
-  ctx.moveTo(pad+25, axisY);
-  ctx.lineTo(w-pad-10, axisY);
+  ctx.moveTo(xMin-30, axisY);
+  ctx.lineTo(w-48, axisY);
   ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(w-pad-10, axisY);
-  ctx.lineTo(w-pad-22, axisY-8);
-  ctx.moveTo(w-pad-10, axisY);
-  ctx.lineTo(w-pad-22, axisY+8);
+  ctx.moveTo(w-48, axisY);
+  ctx.lineTo(w-62, axisY-9);
+  ctx.moveTo(w-48, axisY);
+  ctx.lineTo(w-62, axisY+9);
   ctx.stroke();
-  for(let i=0;i<7;i++){
-    const tx=pad+70+i*((w-2*pad-150)/6);
+  const tickCount = 18;
+  for(let i=0;i<tickCount;i++){
+    const tx=(xMin-26)+i*((w-xMin-48)/(tickCount-1));
     ctx.beginPath();
     ctx.moveTo(tx,axisY-10);
     ctx.lineTo(tx,axisY+10);
     ctx.stroke();
   }
-  ctx.font="22px Sarabun, system-ui, sans-serif";
-  ctx.fillText("x", w-pad-4, axisY+28);
+  ctx.font="24px Sarabun, system-ui, sans-serif";
+  ctx.fillText("x", w-38, axisY+31);
   ctx.restore();
 
-  // Particles: 4 compact rows, longitudinal spacing changes across x.
+  // Particle grid with longitudinal displacement: compressions/rarefactions along x.
   const baseXs=[];
   for(let x=xMin;x<=xMax;x+=baseGap) baseXs.push(x);
-  // Ensure the reference particle is anchored on the exact equilibrium position.
-  // Without this, the nearest particle could be selected, causing the red point
-  // to miss the equilibrium line after reset.
   if(!baseXs.some(v => Math.abs(v - eqX) < 0.5)) baseXs.push(eqX);
   baseXs.sort((a,b)=>a-b);
 
@@ -553,22 +625,18 @@ function drawLongitudinalFinal(ctx, c, p, w, h){
         obsY=y;
         continue;
       }
-
       drawParticleShadow(ctx,x,y,particleRadius);
       drawParticleSphere(ctx,x,y,particleRadius,"cyan");
     }
   }
 
-  // Draw the observation particle last so it stays a full red circle with no blue overlap.
+  // Red reference particle is drawn last and exactly on the equilibrium line at reset.
   ctx.save();
-  const obsRadius = particleRadius + 1.8;
+  const obsRadius = particleRadius + 1.5;
   drawParticleShadow(ctx,obsX,obsY,obsRadius);
   drawParticleSphere(ctx,obsX,obsY,obsRadius,"red");
   ctx.restore();
-
-  // No legend dots under x-axis in this final visual.
 }
-
 
 function drawVizLegend(ctx,c){
   // legend hidden on longitudinal focus page to keep the graph clean
@@ -994,8 +1062,8 @@ function resizeVisualizerCanvas(){
   let cssW = Math.max(280, Math.floor(rect.width - 4));
   const isLandscape = window.matchMedia("(orientation: landscape)").matches;
 
-  let cssH = isLandscape ? Math.round(cssW * 0.34) : Math.round(cssW * 0.42);
-  cssH = Math.max(isLandscape ? 150 : 180, Math.min(cssH, isLandscape ? 210 : 250));
+  let cssH = isLandscape ? Math.round(cssW * 0.34) : Math.round(cssW * 0.50);
+  cssH = Math.max(isLandscape ? 170 : 285, Math.min(cssH, isLandscape ? 235 : 380));
 
   const dpr = Math.max(1, window.devicePixelRatio || 1);
 

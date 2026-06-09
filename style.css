@@ -2001,3 +2001,161 @@ main.wrap{
   .longitudinalFocusPage .paramText small{font-size:.52rem !important;line-height:1.0 !important;}
   .longitudinalFocusPage .neonParamRow .valueBadge{min-width:44px !important;font-size:.62rem !important;padding:2px 4px !important;}
 }
+
+/* v5.61: mobile graph emphasis */
+.longitudinalFocusPage .vizMediaFrame canvas{aspect-ratio:1200/235 !important;min-height:250px !important;}
+.longitudinalFocusPage .embeddedPlayerBar{margin-top:0 !important;}
+@media (max-width:760px){
+  .longitudinalFocusPage .vizMediaFrame canvas{aspect-ratio:1200/220 !important;min-height:220px !important;}
+  .longitudinalFocusPage .vizMediaFrame{padding-bottom:0 !important;}
+}
+
+
+/* v5.62: dense particle graph + left speaker source */
+.longitudinalFocusPage .vizMediaFrame canvas{
+  aspect-ratio:1200/560 !important;
+  min-height:360px !important;
+}
+.longitudinalFocusPage .embeddedPlayerBar{
+  margin-top:4px !important;
+  min-height:62px !important;
+  padding:6px 10px 8px !important;
+}
+.longitudinalFocusPage .embeddedPlayerBar .playerCenterOnly{
+  gap:20px !important;
+}
+.longitudinalFocusPage .embeddedPlayerBar .playerBtn,
+.longitudinalFocusPage .embeddedPlayerBar .playerPrimary{
+  width:54px !important;
+  height:54px !important;
+  transform:none !important;
+}
+.longitudinalFocusPage .neonControlViz{
+  padding:18px 16px !important;
+}
+.longitudinalFocusPage .neonControlViz .panelTitleStack h3{
+  font-size:1.25rem !important;
+}
+.longitudinalFocusPage .panelSubtext{
+  font-size:.74rem !important;
+}
+.longitudinalFocusPage .neonParamRow{
+  padding:9px 0 !important;
+  gap:8px 10px !important;
+}
+.longitudinalFocusPage .paramIcon{
+  width:34px !important;
+  height:34px !important;
+  font-size:1rem !important;
+}
+.longitudinalFocusPage .paramText label{
+  font-size:.78rem !important;
+}
+.longitudinalFocusPage .paramText small{
+  font-size:.64rem !important;
+}
+.longitudinalFocusPage .neonParamRow .valueBadge{
+  min-width:62px !important;
+  font-size:.76rem !important;
+  padding:4px 7px !important;
+}
+
+@media(max-width:760px){
+  .longitudinalFocusPage .vizMediaFrame canvas{
+    aspect-ratio:1200/610 !important;
+    min-height:330px !important;
+  }
+  .longitudinalFocusPage .embeddedPlayerBar{
+    min-height:58px !important;
+    padding:5px 10px 7px !important;
+  }
+  .longitudinalFocusPage .embeddedPlayerBar .playerCenterOnly{
+    gap:18px !important;
+  }
+  .longitudinalFocusPage .embeddedPlayerBar .playerBtn,
+  .longitudinalFocusPage .embeddedPlayerBar .playerPrimary{
+    width:50px !important;
+    height:50px !important;
+  }
+  .longitudinalFocusPage .neonControlViz{
+    padding:13px 12px !important;
+  }
+  .longitudinalFocusPage .neonControlViz .panelTitleStack h3{
+    font-size:1rem !important;
+  }
+  .longitudinalFocusPage .panelSubtext{
+    display:none !important;
+  }
+  .longitudinalFocusPage .neonParamRow{
+    grid-template-columns:30px 1fr 58px !important;
+    grid-template-areas:"icon text value" ". slider slider" !important;
+    padding:6px 0 !important;
+    gap:5px 7px !important;
+  }
+  .longitudinalFocusPage .paramIcon{
+    width:28px !important;
+    height:28px !important;
+    font-size:.82rem !important;
+  }
+  .longitudinalFocusPage .paramText label{
+    font-size:.70rem !important;
+  }
+  .longitudinalFocusPage .paramText small{
+    font-size:.58rem !important;
+  }
+  .longitudinalFocusPage .neonParamRow .valueBadge{
+    min-width:52px !important;
+    font-size:.68rem !important;
+    padding:3px 5px !important;
+  }
+}
+
+@media(max-width:950px) and (orientation:landscape){
+  .longitudinalFocusPage .longitudinalFocusGrid{
+    grid-template-columns:minmax(0,2.75fr) minmax(140px,.36fr) !important;
+    gap:10px !important;
+  }
+  .longitudinalFocusPage .vizMediaFrame canvas{
+    aspect-ratio:1200/410 !important;
+    min-height:210px !important;
+  }
+  .longitudinalFocusPage .embeddedPlayerBar{
+    min-height:48px !important;
+    padding:4px 8px 5px !important;
+  }
+  .longitudinalFocusPage .embeddedPlayerBar .playerBtn,
+  .longitudinalFocusPage .embeddedPlayerBar .playerPrimary{
+    width:40px !important;
+    height:40px !important;
+  }
+  .longitudinalFocusPage .neonControlViz{
+    padding:10px !important;
+  }
+  .longitudinalFocusPage .neonControlViz .panelTitleStack h3{
+    font-size:.9rem !important;
+  }
+  .longitudinalFocusPage .panelSubtext{
+    display:none !important;
+  }
+  .longitudinalFocusPage .neonParamRow{
+    padding:4px 0 !important;
+    grid-template-columns:24px 1fr 46px !important;
+    gap:4px 6px !important;
+  }
+  .longitudinalFocusPage .paramIcon{
+    width:22px !important;
+    height:22px !important;
+    font-size:.68rem !important;
+  }
+  .longitudinalFocusPage .paramText label{
+    font-size:.60rem !important;
+  }
+  .longitudinalFocusPage .paramText small{
+    font-size:.50rem !important;
+  }
+  .longitudinalFocusPage .neonParamRow .valueBadge{
+    min-width:42px !important;
+    font-size:.60rem !important;
+    padding:2px 4px !important;
+  }
+}
