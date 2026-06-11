@@ -2447,3 +2447,6 @@ main.wrap{
 
 .soundTopicPage .vizMediaFrame canvas{background:transparent;}
 .soundTopicPage .conceptChip .chipIcon{min-width:34px;}
+
+.rebuiltTopicPage .vizMediaFrame canvas{background:transparent;}
+.rebuiltTopicPage select{min-width:116px;border-radius:14px;border:1px solid rgba(148,163,184,.28);background:rgba(15,23,42,.72);color:#e5f4ff;padding:8px 10px;}
